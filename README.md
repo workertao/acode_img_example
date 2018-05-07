@@ -45,5 +45,5 @@
 
 ## 效果图##
 ![效果图](https://github.com/workertao/acode_img_example/tree/master/images/GIF.gif)
-(如果查看不了，请点击以上文字跳转网页查看)
+(如果查看不了，请点击文字跳转网页查看)
 
