@@ -44,7 +44,6 @@
 4. 在ImagePhoto实体中增加了compressPath字段(压缩后的文件路径)，可直接用作上传。
 
 ## 效果图##
-![效果图](https://github.com/workertao/acode_img_example/tree/master/icon/GIF.gif)
-
-(ps:如果查看不了，请点击以上文字跳转网页查看)
+![效果图](https://github.com/workertao/acode_img_example/tree/master/images/GIF.gif)
+(如果查看不了，请点击以上文字跳转网页查看)
 
