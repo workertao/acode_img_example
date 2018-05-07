@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:orientation="vertical">
+    <!--viewpager-->
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_banner"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+
+    <!--页眉，展示当前下标或者内容介绍-->
+    <RelativeLayout
+        android:id="@+id/acode_rl_point"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <RelativeLayout
+            android:id="@+id/acode_rl_title"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="#b0000000">
+
+            <TextView
+                android:id="@+id/acode_tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="内容介绍"
+                android:textColor="@android:color/white" />
+
+            <LinearLayout
+                android:id="@+id/acode_layout_point"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+            </LinearLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+</RelativeLayout>
