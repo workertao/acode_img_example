@@ -1,4 +1,8 @@
 # 仿今日头条自定义相册 #
+## 效果图##
+![效果图](https://github.com/workertao/acode_img_example/tree/master/images/GIF.gif)
+(如果查看不了，请点击文字跳转网页查看)
+
 ## 使用方法 ##
 1.在activity或者frgament实现以下接口
 
@@ -42,8 +46,4 @@
 2. 纠正图片旋转角度
 3. 针对后缀是jpg,jpeg,png，但却不是图片的文件处理。
 4. 在ImagePhoto实体中增加了compressPath字段(压缩后的文件路径)，可直接用作上传。
-
-## 效果图##
-![效果图](https://github.com/workertao/acode_img_example/tree/master/images/GIF.gif)
-(如果查看不了，请点击文字跳转网页查看)
 
