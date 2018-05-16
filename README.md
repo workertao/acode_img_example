@@ -27,7 +27,15 @@
 
 	acodeImgLibHelper.getPhotoList();
 
-5.必须重写以下两个方法
+5.查看选中大图(这里可执行删除操作)
+	
+	acodeImgLibHelper.showBigPhoto( imagePhotos, selectPhotoData, position);
+
+6.删除选中图片
+	
+	acodeImgLibHelper.remove(position);
+
+7.必须重写以下两个方法
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -41,9 +49,13 @@
         acodeImgLibHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-## 解决问题 ##
+## 1.0版本 ##
 1. 多张大图压缩oom问题
 2. 纠正图片旋转角度
 3. 针对后缀是jpg,jpeg,png，但却不是图片的文件处理。
 4. 在ImagePhoto实体中增加了compressPath字段(压缩后的文件路径)，可直接用作上传。
 
+
+## 1.1版本 ##
+1. 优化照片选中后，loading卡死的情况
+2. 可以设置图片的选中最大数量

@@ -1,1 +1,1 @@
-include ':app', ':acode_img_lib', ':test'
+include ':app', ':acode_img_lib'
