@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements AcodeImgLibListen
     }
 
     private void initData() {
-        acodeImgLibHelper = new AcodeImgLibHelper(this, this);
+        acodeImgLibHelper = new AcodeImgLibHelper(this, this,1);
         myAdapter = new MyAdapter();
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         rv.setLayoutManager(gridLayoutManager);
