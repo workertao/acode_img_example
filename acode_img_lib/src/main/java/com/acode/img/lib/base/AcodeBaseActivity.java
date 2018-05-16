@@ -21,14 +21,27 @@ import java.lang.reflect.Method;
  * email:yangtao@bjxmail.com
  * introduce:AcodeBaseActivity
  */
-public abstract class AcodeBaseActivity extends Activity{
+public abstract class AcodeBaseActivity extends Activity {
     public abstract int initSystemBarColor();
+
     public LoadingDialog loadingDialog;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initSystemBar(this,initSystemBarColor());
+        initSystemBar(this, initSystemBarColor());
+        initLoading();
+    }
+
+    private void initLoading() {
         loadingDialog = new LoadingDialog(this);
+        loadingDialog.setCanceledOnTouchOutside(false);
+        loadingDialog.setOnBackClickListener(new LoadingDialog.OnBackClickListener() {
+            @Override
+            public void onBackClick() {
+                loadingDialog = null;
+            }
+        });
     }
 
     public void initSystemBar(Activity activity, int resColor) {
@@ -73,12 +86,13 @@ public abstract class AcodeBaseActivity extends Activity{
         win.setAttributes(winP);
 
     }
+
     /**
      * 显示PB
      */
     protected void showProgress() {
         if (loadingDialog == null) {
-            loadingDialog = new LoadingDialog(this);
+            initLoading();
         }
         this.loadingDialog.show();
     }
@@ -92,6 +106,7 @@ public abstract class AcodeBaseActivity extends Activity{
         }
         try {
             this.loadingDialog.dismiss();
+            this.loadingDialog = null;
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -47,12 +47,31 @@ public class AcodeImgLibHelper implements IAcoderImgLibHelper {
     //相册工具类的回调监听
     private AcodeImgLibListener acodeImgLibListener;
 
-    public AcodeImgLibHelper(Object context, AcodeImgLibListener acodeImgLibListener) {
+    /**
+     *
+     * @param context
+     * @param acodeImgLibListener   选中照片回调
+     * @param count                 设置最大选中数量
+     */
+    public AcodeImgLibHelper(Object context, AcodeImgLibListener acodeImgLibListener,int count) {
         this.context = context;
         this.acodeImgLibListener = acodeImgLibListener;
+        setCount(count);
         permissionUtils = new PermissionUtils((Activity) context);
         imgCameras = new ArrayList<>();
         imgPhotos = new ArrayList<>();
+    }
+
+    //设置最大的选中数量
+    @Override
+    public void setCount(int count) {
+        if (count < 1) {
+            AcodeCameraConfig.MAX_SIZE = 1;
+        } else if (count > 9) {
+            AcodeCameraConfig.MAX_SIZE = 9;
+        } else {
+            AcodeCameraConfig.MAX_SIZE = count;
+        }
     }
 
     @Override
@@ -71,8 +90,13 @@ public class AcodeImgLibHelper implements IAcoderImgLibHelper {
                 , permissionUtils.request_permission);
         if (isFlag) {
             Intent intent1 = new Intent((Activity) context, AcodePhotoListActivity.class);
-            intent1.putExtra("selectPhotoData", imgPhotos);
-            intent1.putExtra("cameraSize", imgCameras.size());
+            if (AcodeCameraConfig.MAX_SIZE > 1) {
+                intent1.putExtra("selectPhotoData", imgPhotos);
+                intent1.putExtra("cameraSize", imgCameras.size());
+            } else {
+                intent1.putExtra("selectPhotoData", new ArrayList<ImagePhoto>());
+                intent1.putExtra("cameraSize", 0);
+            }
             ((Activity) context).startActivityForResult(intent1, AcodeCameraConfig.SELECT_VP_REQUEST);
         }
     }
@@ -83,6 +107,20 @@ public class AcodeImgLibHelper implements IAcoderImgLibHelper {
             return;
         }
         ImagePhoto imagePhoto = all.get(position);
+        if (imgPhotos.contains(imagePhoto)) {
+            imgPhotos.remove(imagePhoto);
+        }
+        if (imgCameras.contains(imagePhoto)) {
+            imgCameras.remove(imagePhoto);
+        }
+        notifydata();
+    }
+
+    @Override
+    public void remove(ImagePhoto imagePhoto) {
+        if (all == null || all.size() == 0) {
+            return;
+        }
         if (imgPhotos.contains(imagePhoto)) {
             imgPhotos.remove(imagePhoto);
         }
@@ -125,6 +163,10 @@ public class AcodeImgLibHelper implements IAcoderImgLibHelper {
                     imgPhotos.clear();
                     imgPhotos = null;
                 }
+                //如果只能选择一张，则将之前选中的全部清空
+                if (AcodeCameraConfig.MAX_SIZE == 1) {
+                    imgCameras.clear();
+                }
                 //获取绑定的数据源
                 Bundle bundle = data.getBundleExtra("bundle");
                 if (bundle == null) {
@@ -136,7 +178,7 @@ public class AcodeImgLibHelper implements IAcoderImgLibHelper {
                 Log.d("post", "相册地址：" + imgPhotos.toString());
                 break;
             case AcodeCameraConfig.GOTO_VP_REQUEST:
-                //viewpager返回的数据，里边包含了拍照的照片，先清空然后重新添加。
+                //这是查看已选中的图片，viewpager返回的数据，里边包含了拍照的照片，先清空然后重新添加。
                 if (imgPhotos != null) {
                     imgPhotos.clear();
                 }
@@ -144,6 +186,9 @@ public class AcodeImgLibHelper implements IAcoderImgLibHelper {
                     imgCameras.clear();
                 }
                 ArrayList<ImagePhoto> imagePhotos = (ArrayList<ImagePhoto>) data.getSerializableExtra("selectPhotoData");
+                if (null==imagePhotos){
+                    imagePhotos = new ArrayList<>();
+                }
                 for (ImagePhoto imagePhoto1 : imagePhotos) {
                     if (imagePhoto1.getPhotoType().equals(ImagePhoto.PHOTO_TYPE_CAMERA)) {
                         imgCameras.add(imagePhoto1);
@@ -190,6 +235,11 @@ public class AcodeImgLibHelper implements IAcoderImgLibHelper {
         CompressUtils.compressOne(imagePhoto, new CompressRunable.CompressListener() {
             @Override
             public void onCompressComplete(final ImagePhoto imagePhoto) {
+                //如果只能选择一张，则将之前选中的全部清空
+                if (AcodeCameraConfig.MAX_SIZE == 1) {
+                    imgPhotos.clear();
+                    imgCameras.clear();
+                }
                 //将照片添加到集合中
                 imgCameras.add(imagePhoto);
                 notifydata();
@@ -215,19 +265,21 @@ public class AcodeImgLibHelper implements IAcoderImgLibHelper {
         if (imgPhotos != null) {
             all.addAll(imgPhotos);
         }
-        //根据时间戳排序
-        Collections.sort(all, new Comparator<ImagePhoto>() {
-            @Override
-            public int compare(ImagePhoto ip1, ImagePhoto ip2) {
-                if (ip1.getIndex() < ip2.getIndex()) {
-                    return -1;
-                } else if (ip1.getIndex() > ip2.getIndex()) {
-                    return 1;
-                } else {
-                    return 0;
+        if (AcodeCameraConfig.MAX_SIZE > 1) {
+            //根据时间戳排序
+            Collections.sort(all, new Comparator<ImagePhoto>() {
+                @Override
+                public int compare(ImagePhoto ip1, ImagePhoto ip2) {
+                    if (ip1.getIndex() < ip2.getIndex()) {
+                        return -1;
+                    } else if (ip1.getIndex() > ip2.getIndex()) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
                 }
-            }
-        });
+            });
+        }
         ((Activity) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {

@@ -14,7 +14,7 @@ public class AcodeCameraConfig {
 
     public static final int SELECT_CLIPPER_PIC = 3;
 
-    public static final int MAX_SIZE = 9;
+    public static int MAX_SIZE = 9;
 
     public static final int SELECT_VP_REQUEST = 20001;
 

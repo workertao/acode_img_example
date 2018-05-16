@@ -25,11 +25,23 @@ public interface IAcoderImgLibHelper {
     void getPhotoList();
 
     /**
+     * 设置选中的图片数量
+     * @param count
+     */
+    void setCount(int count);
+
+    /**
      * 删除某个
      *
      * @param position
      */
     void remove(int position);
+    /**
+     * 删除某个
+     *
+     * @param imagePhoto 实体
+     */
+    void remove(ImagePhoto imagePhoto);
 
     /**
      * 查看大图

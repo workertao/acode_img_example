@@ -65,9 +65,23 @@ public class LoadingDialog extends Dialog {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (isShowing() && isDismiss) {
                 dismiss();
+                if (onBackClickListener!=null){
+                    onBackClickListener.onBackClick();
+                }
             }
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+    public OnBackClickListener onBackClickListener;
+
+    public LoadingDialog setOnBackClickListener(OnBackClickListener onBackClickListener) {
+        this.onBackClickListener = onBackClickListener;
+        return this;
+    }
+
+    //返回键监听
+    public interface OnBackClickListener {
+        void onBackClick();
     }
 }
