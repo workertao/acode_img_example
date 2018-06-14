@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements AcodeImgLibListen
     }
 
     private void initData() {
-        acodeImgLibHelper = new AcodeImgLibHelper(this, this,1);
+        acodeImgLibHelper = new AcodeImgLibHelper(this, this,9);
         myAdapter = new MyAdapter();
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         rv.setLayoutManager(gridLayoutManager);
@@ -79,6 +79,12 @@ public class MainActivity extends AppCompatActivity implements AcodeImgLibListen
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         acodeImgLibHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        acodeImgLibHelper.release();
     }
 
     public class MyAdapter extends RecyclerView.Adapter {

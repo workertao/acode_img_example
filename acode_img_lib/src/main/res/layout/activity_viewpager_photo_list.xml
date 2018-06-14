@@ -18,7 +18,7 @@
             android:drawableLeft="@mipmap/ic_back_white"
             android:drawablePadding="15px"
             android:paddingLeft="24px"
-            android:text="取消"
+            android:text="返回"
             android:textColor="#ffffff"
             android:textSize="15dp" />
 
@@ -29,7 +29,6 @@
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
             android:gravity="center"
-            android:text="25/123"
             android:textColor="#ffffff"
             android:textSize="15dp" />
 
@@ -62,28 +61,27 @@
         android:id="@+id/vp_photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/rl_bottom"
         android:layout_below="@id/rl_top" />
 
 
-    <RelativeLayout
-        android:id="@id/rl_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true">
+    <!--<RelativeLayout-->
+        <!--android:id="@id/rl_bottom"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:layout_alignParentBottom="true">-->
 
-        <TextView
-            android:id="@+id/tv_save"
-            android:layout_width="70dp"
-            android:layout_height="35dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10px"
-            android:background="#65A1FC"
-            android:gravity="center"
-            android:text="确定"
-            android:textColor="#ffffff"
-            android:textSize="15dp" />
-    </RelativeLayout>
+        <!--<TextView-->
+            <!--android:id="@+id/tv_save"-->
+            <!--android:layout_width="70dp"-->
+            <!--android:layout_height="35dp"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:layout_marginRight="10px"-->
+            <!--android:background="#65A1FC"-->
+            <!--android:gravity="center"-->
+            <!--android:text="确定"-->
+            <!--android:textColor="#ffffff"-->
+            <!--android:textSize="15dp" />-->
+    <!--</RelativeLayout>-->
 
 </RelativeLayout>

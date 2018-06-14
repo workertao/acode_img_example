@@ -13,9 +13,9 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.acode.img.lib.R;
+import com.acode.img.lib.entity.ImagePhoto;
 import com.acode.img.lib.utils.DimenUtils;
 import com.acode.img.lib.utils.DisplayUtils;
-import com.acode.img.lib.entity.ImagePhoto;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -108,10 +108,12 @@ public class AcodeRvPhotoListAdapter extends RecyclerView.Adapter {
                         .placeholder(R.mipmap.ic_default_album)
                         .error(R.mipmap.ic_default_album)
                         .dontAnimate()
+                        .centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.ALL);
                 //设置图片
                 Glide.with(context)
                         .load(imagePhoto.getPath())
+                        .apply(options)
                         .listener(new RequestListener<Drawable>() {
                             @Override
                             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -125,7 +127,6 @@ public class AcodeRvPhotoListAdapter extends RecyclerView.Adapter {
                                 return false;
                             }
                         })
-                        .apply(options)
                         .into(acodeRvPhotoListHolder.img_photo);
                 //设置点击事件
                 acodeRvPhotoListHolder.img_photo_check.setOnClickListener(new View.OnClickListener() {
@@ -136,7 +137,7 @@ public class AcodeRvPhotoListAdapter extends RecyclerView.Adapter {
                             return;
                         }
                         if (onPhotoClickListener != null) {
-                            onPhotoClickListener.onSelectClick(position, imagePhoto, imagePhotos);
+                            onPhotoClickListener.onSelectClick(position, imagePhoto);
                         }
                     }
                 });
@@ -145,7 +146,7 @@ public class AcodeRvPhotoListAdapter extends RecyclerView.Adapter {
                     @Override
                     public void onClick(View v) {
                         if (onPhotoClickListener != null) {
-                            onPhotoClickListener.onIntentClick(position, imagePhoto, imagePhotos);
+                            onPhotoClickListener.onIntentClick(position);
                         }
                     }
                 });
@@ -183,9 +184,9 @@ public class AcodeRvPhotoListAdapter extends RecyclerView.Adapter {
     }
 
     public interface OnPhotoClickListener {
-        void onSelectClick(int position, ImagePhoto imagePhoto, ArrayList<ImagePhoto> imagePhotos);
+        void onSelectClick(int position, ImagePhoto imagePhoto);
 
-        void onIntentClick(int position, ImagePhoto imagePhoto, ArrayList<ImagePhoto> imagePhotos);
+        void onIntentClick(int position);
     }
 
     private void gvMathParams(View view) {

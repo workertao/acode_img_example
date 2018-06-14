@@ -27,7 +27,6 @@
             android:id="@+id/tv_album_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="張三"
             android:textColor="#333333"
             android:textSize="15dp"
             android:textStyle="bold" />
@@ -37,7 +36,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="1"
             android:textColor="#333333"
             android:textSize="14dp" />
     </LinearLayout>

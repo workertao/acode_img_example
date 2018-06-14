@@ -10,8 +10,10 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
@@ -20,16 +22,15 @@ import android.widget.Toast;
 
 import com.acode.img.lib.R;
 import com.acode.img.lib.base.AcodeBaseActivity;
-import com.acode.img.lib.utils.SpaceItemDecoration;
 import com.acode.img.lib.data.AcodeCameraConfig;
 import com.acode.img.lib.entity.ImageFloder;
 import com.acode.img.lib.entity.ImagePhoto;
-import com.acode.img.lib.utils.runable.CompressRunable;
 import com.acode.img.lib.utils.CompressUtils;
-import com.acode.img.lib.utils.FileUtils;
+import com.acode.img.lib.utils.SingleImagePhotosUtils;
+import com.acode.img.lib.utils.SpaceItemDecoration;
+import com.acode.img.lib.utils.runable.CompressRunable;
 import com.acode.img.lib.utils.runable.ReadPhotoRunable;
 import com.acode.img.lib.viewpager.weigt.photo.AcodePhotoVpActivity;
-import com.alibaba.fastjson.JSON;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -71,10 +72,6 @@ public class AcodePhotoListActivity extends AcodeBaseActivity
     private ImageFloder currentImageFloder;
     //确定
     private TextView tv_confirm;
-    //已经选中的图片集合
-    private ArrayList<ImagePhoto> selectPhotoData = new ArrayList<>();
-    //选中的拍照数量
-    private int cameraSize;
 
     private View view_space_line;
 
@@ -91,7 +88,7 @@ public class AcodePhotoListActivity extends AcodeBaseActivity
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("post","onCreate");
+        Log.d("post", "onCreate");
         setContentView(R.layout.activity_photo_list);
         initView();
         initAlbumAndPhoto();
@@ -109,8 +106,6 @@ public class AcodePhotoListActivity extends AcodeBaseActivity
         ll_album_name.setOnClickListener(this);
         tv_confirm.setOnClickListener(this);
         tv_cancel.setOnClickListener(this);
-        selectPhotoData = (ArrayList<ImagePhoto>) getIntent().getSerializableExtra("selectPhotoData");
-        cameraSize = getIntent().getIntExtra("cameraSize", 0);
         updateSelectPhotoDataUI();
         initReclyView();
     }
@@ -206,16 +201,18 @@ public class AcodePhotoListActivity extends AcodeBaseActivity
 
     //首次加载初始化数据，全部照片
     private void initPhotoList() {
-        String photoData = FileUtils.loadDataFromFile(AcodePhotoListActivity.this, FileUtils.FILE_ALL_PHOTOS_NAME);
-        ArrayList<ImagePhoto> currentPhotosData = (ArrayList<ImagePhoto>) JSON.parseArray(photoData, ImagePhoto.class);
+//        String photoData = FileUtils.loadDataFromFile(AcodePhotoListActivity.this, FileUtils.FILE_ALL_PHOTOS_NAME);
+//        ArrayList<ImagePhoto> currentPhotosData = (ArrayList<ImagePhoto>) JSON.parseArray(photoData, ImagePhoto.class);
+        ArrayList<ImagePhoto> currentPhotosData = SingleImagePhotosUtils.getIntance().getAllImagePhotos();
         tv_album_name.setText(currentImageFloder.getName() + "(" + currentImageFloder.getCount() + ")");
         if (currentPhotosData == null || currentPhotosData.size() == 0) {
             Toast.makeText(AcodePhotoListActivity.this, "没有查询到图片", Toast.LENGTH_LONG).show();
             return;
         }
         for (int i = 0; i < currentPhotosData.size(); i++) {
-            for (int j = 0; j < selectPhotoData.size(); j++) {
-                if (currentPhotosData.get(i).getPath().equals(selectPhotoData.get(j).getPath())) {
+            currentPhotosData.get(i).setSelect(false);
+            for (int j = 0; j < SingleImagePhotosUtils.getIntance().getSelectImagePhotos().size(); j++) {
+                if (currentPhotosData.get(i).getPath().equals(SingleImagePhotosUtils.getIntance().getSelectImagePhotos().get(j).getPath())) {
                     currentPhotosData.get(i).setSelect(true);
                 }
             }
@@ -245,13 +242,14 @@ public class AcodePhotoListActivity extends AcodeBaseActivity
                 imagePhoto.setLastModified(files[i].lastModified());
                 imagePhoto.setSelect(false);
                 imagePhoto.setPhotoType(ImagePhoto.PHOTO_TYPE_SYSTEM_LIST);
-                for (int j = 0; j < selectPhotoData.size(); j++) {
-                    if (files[i].getPath().equals(selectPhotoData.get(j).getPath())) {
+                for (int j = 0; j < SingleImagePhotosUtils.getIntance().getSelectImagePhotos().size(); j++) {
+                    if (files[i].getPath().equals(SingleImagePhotosUtils.getIntance().getSelectImagePhotos().get(j).getPath())) {
                         imagePhoto.setSelect(true);
                     }
                 }
                 currentPhotosData.add(imagePhoto);
             }
+            SingleImagePhotosUtils.getIntance().setCurrentImagePhotos(currentPhotosData);
             updateUi(true, currentPhotosData);
         } catch (Exception e) {
             e.printStackTrace();
@@ -269,7 +267,7 @@ public class AcodePhotoListActivity extends AcodeBaseActivity
                         return 1;
                     } else if (ip1.getLastModified() > ip2.getLastModified()) {
                         return -1;
-                    }else {
+                    } else {
                         return 0;
                     }
                 }
@@ -286,15 +284,12 @@ public class AcodePhotoListActivity extends AcodeBaseActivity
 
     //选中事件
     @Override
-    public void onSelectClick(int position, ImagePhoto imagePhoto, ArrayList<ImagePhoto> imagePhotos) {
+    public void onSelectClick(int position, ImagePhoto imagePhoto) {
         //当选中的图片小于指定数量的时候  或者  选中的图片集合包含当前图片
-        if (getSize() < AcodeCameraConfig.MAX_SIZE || selectPhotoData.contains(imagePhoto)) {
-            //设置选中图片对象为选中状态
-            imagePhoto.setSelect(!imagePhoto.isSelect());
-            //更新选中图片对象数据
-            imagePhotos.set(position, imagePhoto);
-            setSelectPhotoData(imagePhoto);
+        if (getSize() < AcodeCameraConfig.MAX_SIZE || SingleImagePhotosUtils.getIntance().getSelectImagePhotos().contains(imagePhoto)) {
+            SingleImagePhotosUtils.getIntance().setSelectState(position);
             updateSelectPhotoDataUI();
+            acodeRvPhotoListAdapter.setData(SingleImagePhotosUtils.getIntance().getCurrentImagePhotos());
             acodeRvPhotoListAdapter.notifyItemChanged(position, AcodePhotoListActivity.class.getSimpleName());
             return;
         }
@@ -303,7 +298,7 @@ public class AcodePhotoListActivity extends AcodeBaseActivity
 
     //当前选中图片的总数量
     private int getSize() {
-        return selectPhotoData.size() + cameraSize;
+        return SingleImagePhotosUtils.getIntance().getSelectSize();
     }
 
     //修改界面ui
@@ -315,34 +310,11 @@ public class AcodePhotoListActivity extends AcodeBaseActivity
         }
     }
 
-    //将选中的图片返回到指定集合中
-    private void setSelectPhotoData(ImagePhoto imagePhoto) {
-        if (imagePhoto.isSelect()) {
-            imagePhoto.setIndex(System.currentTimeMillis());
-            selectPhotoData.add(imagePhoto);
-            return;
-        }
-        selectPhotoData.remove(getIndex(imagePhoto));
-    }
-
-    //获取被选中的实体下标
-    private int getIndex(ImagePhoto imagePhoto) {
-        for (int i = 0; i < selectPhotoData.size(); i++) {
-            if (selectPhotoData.get(i).getPath().equals(imagePhoto.getPath())) {
-                return i;
-            }
-        }
-        return 0;
-    }
-
     //跳转事件
     @Override
-    public void onIntentClick(int position, ImagePhoto imagePhoto, ArrayList<ImagePhoto> imagePhotos) {
+    public void onIntentClick(int position) {
         Intent intent = new Intent(AcodePhotoListActivity.this, AcodePhotoVpActivity.class);
-        intent.putExtra("imagePhotos", imagePhotos);
-        intent.putExtra("selectPhotoData", selectPhotoData);
         intent.putExtra("position", position);
-        intent.putExtra("cameraSize", cameraSize);
         startActivityForResult(intent, AcodeCameraConfig.GOTO_VP_REQUEST);
     }
 
@@ -369,52 +341,54 @@ public class AcodePhotoListActivity extends AcodeBaseActivity
             popWindowAlbum.show(view_space_line);
             return;
         }
-        if (v.getId() == R.id.tv_confirm) {
-            if (selectPhotoData == null || selectPhotoData.size() == 0) {
-                finish();
-                return;
-            }
-            showProgress();
-            CompressUtils.compressAll(selectPhotoData, new CompressRunable.AllCompressListener() {
-                @Override
-                public void onAllCompressComplete(ArrayList<ImagePhoto> imagePhotos) {
-                    AcodePhotoListActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            dismissProgress();
-                            Intent intent = new Intent();
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable("selectPhotoData", selectPhotoData);
-                            intent.putExtra("bundle", bundle);
-                            setResult(AcodeCameraConfig.SELECT_VP_RESPONSE, intent);
-                            finish();
-                        }
-                    });
-                }
-            });
+        if (v.getId() == R.id.tv_cancel
+                || v.getId() == R.id.tv_confirm) {
+            CompressAndCallback();
             return;
         }
-        if (v.getId() == R.id.tv_cancel) {
-            this.finish();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        CompressAndCallback();
+        return super.onKeyDown(keyCode, event);
+    }
+
+    /**
+     * 压缩并返回上一个页面
+     */
+    private void CompressAndCallback() {
+        if (SingleImagePhotosUtils.getIntance().getSelectImagePhotos() == null || SingleImagePhotosUtils.getIntance().getSelectImagePhotos().size() == 0) {
+            finish();
+            return;
         }
+        showProgress();
+        CompressUtils.compressAll(SingleImagePhotosUtils.getIntance().getSelectImagePhotos(), new CompressRunable.AllCompressListener() {
+            @Override
+            public void onAllCompressComplete(ArrayList<ImagePhoto> imagePhotos) {
+                AcodePhotoListActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dismissProgress();
+                        Intent intent = new Intent();
+                        setResult(AcodeCameraConfig.SELECT_VP_RESPONSE, intent);
+                        finish();
+                    }
+                });
+            }
+        });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data == null) {
-            return;
-        }
         switch (requestCode) {
             case AcodeCameraConfig.GOTO_VP_REQUEST:
-                ArrayList<ImagePhoto> imagePhotos = (ArrayList<ImagePhoto>) data.getSerializableExtra("imagePhotos");
-                ArrayList<ImagePhoto> selectPhotoData = (ArrayList<ImagePhoto>) data.getSerializableExtra("selectPhotoData");
-                this.selectPhotoData.clear();
-                this.selectPhotoData = selectPhotoData;
                 updateSelectPhotoDataUI();
-                acodeRvPhotoListAdapter.setData(imagePhotos);
+                acodeRvPhotoListAdapter.setData(SingleImagePhotosUtils.getIntance().getCurrentImagePhotos());
                 acodeRvPhotoListAdapter.notifyDataSetChanged();
                 break;
         }
     }
+
 }

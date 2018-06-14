@@ -18,6 +18,7 @@
 2.在activity或者frgament声明帮助类
  
 	private IAcoderImgLibHelper acodeImgLibHelper;
+	acodeImgLibHelper = new AcodeImgLibHelper(this, this,9);
 
 3.相机调用
 
@@ -48,14 +49,25 @@
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         acodeImgLibHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        acodeImgLibHelper.release();
+    }   
 
-## 1.0版本 ##
+## 0.1版本 ##
 1. 多张大图压缩oom问题
 2. 纠正图片旋转角度
 3. 针对后缀是jpg,jpeg,png，但却不是图片的文件处理。
 4. 在ImagePhoto实体中增加了compressPath字段(压缩后的文件路径)，可直接用作上传。
 
 
-## 1.1版本 ##
+## 0.2版本 ##
 1. 优化照片选中后，loading卡死的情况
 2. 可以设置图片的选中最大数量
+
+## 0.3版本 ##
+1. 提取出选中图片和当前展示的数据集
+2. 避免了页面传参，从单利中读取
+

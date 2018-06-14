@@ -1,5 +1,6 @@
 package com.acode.img.lib.viewpager.weigt.photo;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
@@ -17,6 +18,7 @@ import com.acode.img.lib.R;
 import com.acode.img.lib.data.AcodeCameraConfig;
 import com.acode.img.lib.data.AcodeVpConfig;
 import com.acode.img.lib.entity.ImagePhoto;
+import com.acode.img.lib.utils.SingleImagePhotosUtils;
 import com.acode.img.lib.viewpager.listener.AcodeClickListener;
 
 import java.util.ArrayList;
@@ -29,8 +31,6 @@ import java.util.List;
 
 public class AcodePhotoVp extends LinearLayout implements ViewPager.OnPageChangeListener, View.OnClickListener {
     private ViewPager vp_photo;
-    //保存
-    private TextView tv_save;
     //取消
     private TextView tv_cancel;
     //页数
@@ -41,8 +41,6 @@ public class AcodePhotoVp extends LinearLayout implements ViewPager.OnPageChange
     private ImageView img_select_icon;
     //当前下标
     private int index;
-    //已经选中的图片数量
-    private ArrayList<ImagePhoto> selectPhotoData;
     //已经选中
     private LinearLayout ll_select_root;
     //数据
@@ -77,13 +75,11 @@ public class AcodePhotoVp extends LinearLayout implements ViewPager.OnPageChange
         vp_photo = (ViewPager) view.findViewById(R.id.vp_photo);
         tv_select_nub_size = (TextView) view.findViewById(R.id.tv_select_nub_size);
         img_select_icon = (ImageView) view.findViewById(R.id.img_select_icon);
-        tv_save = (TextView) view.findViewById(R.id.tv_save);
         tv_cancel = (TextView) view.findViewById(R.id.tv_cancel);
         tv_num_size = (TextView) view.findViewById(R.id.tv_num_size);
         ll_select_root = (LinearLayout) view.findViewById(R.id.ll_select_root);
 
         ll_select_root.setOnClickListener(this);
-        tv_save.setOnClickListener(this);
         tv_cancel.setOnClickListener(this);
         this.addView(view);
     }
@@ -154,14 +150,8 @@ public class AcodePhotoVp extends LinearLayout implements ViewPager.OnPageChange
     }
 
     public AcodePhotoVp setSelectPhotoData(ArrayList<ImagePhoto> selectPhotoData) {
-        if (selectPhotoData == null) {
-            this.selectPhotoData = new ArrayList<>();
-            return this;
-        }
-        this.selectPhotoData = selectPhotoData;
         tv_select_nub_size.setText("(" + getSize() + "/" + AcodeCameraConfig.MAX_SIZE + ")");
         return this;
-
     }
 
     //========================================OnPageChangeListener 页面切换监听==============================================
@@ -205,62 +195,30 @@ public class AcodePhotoVp extends LinearLayout implements ViewPager.OnPageChange
                 Toast.makeText(context, "图片顺坏", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (getSize() < AcodeCameraConfig.MAX_SIZE || selectPhotoData.contains(imagePhoto)) {
-                imagePhoto.setSelect(!imagePhoto.isSelect());
-                imagePhotos.set(index, imagePhoto);
-                onIsSelect(imagePhoto.isSelect());
-                setSelectPhotoData(imagePhoto);
+            if (getSize() < AcodeCameraConfig.MAX_SIZE || SingleImagePhotosUtils.getIntance().getSelectImagePhotos().contains(imagePhoto)) {
+                SingleImagePhotosUtils.getIntance().setSelectState(index);
+                onIsSelect(SingleImagePhotosUtils.getIntance().getCurrentSelect(index));
                 updateSelectPhotoDataUI();
-                Log.d("post", selectPhotoData.toString());
                 return;
             }
             Toast.makeText(context, "最多选" + AcodeCameraConfig.MAX_SIZE + "张", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (v.getId() == R.id.tv_save) {
-            if (acodeClickListener != null) {
-                Log.d("post", "imagePhotos:" + imagePhotos.size());
-                Log.d("post", "selectPhotoData:" + selectPhotoData.toString());
-                acodeClickListener.onResultPhotoData((ArrayList<ImagePhoto>) imagePhotos, selectPhotoData);
-
-            }
-            return;
-        }
         if (v.getId() == R.id.tv_cancel) {
-            if (acodeClickListener != null) {
-                acodeClickListener.back();
-            }
+            ((Activity) context).finish();
+            return;
         }
     }
 
     //修改界面ui
     private void updateSelectPhotoDataUI() {
-        if (selectPhotoData.size() != 0) {
+        if (SingleImagePhotosUtils.getIntance().getSelectSize() != 0) {
             tv_select_nub_size.setText("(" + getSize() + "/" + AcodeCameraConfig.MAX_SIZE + ")");
         } else {
             tv_select_nub_size.setText("");
         }
     }
 
-    //将选中的图片返回到指定集合中
-    private void setSelectPhotoData(ImagePhoto imagePhoto) {
-        if (imagePhoto.isSelect()) {
-            imagePhoto.setIndex(System.currentTimeMillis());
-            selectPhotoData.add(imagePhoto);
-            return;
-        }
-        selectPhotoData.remove(getIndex(imagePhoto));
-    }
-
-    //获取被选中的实体下标
-    private int getIndex(ImagePhoto imagePhoto) {
-        for (int i = 0; i < selectPhotoData.size(); i++) {
-            if (selectPhotoData.get(i).getPath().equals(imagePhoto.getPath())) {
-                return i;
-            }
-        }
-        return 0;
-    }
 
     //区分当前图片是否选中
     private void onIsSelect(boolean isSelect) {
@@ -271,14 +229,7 @@ public class AcodePhotoVp extends LinearLayout implements ViewPager.OnPageChange
         img_select_icon.setImageResource(R.mipmap.icon_select);
     }
 
-    private int cameraSize;
-
-    public AcodePhotoVp setCameraSize(int cameraSize) {
-        this.cameraSize = cameraSize;
-        return this;
-    }
-
     private int getSize() {
-        return selectPhotoData.size() + cameraSize;
+        return SingleImagePhotosUtils.getIntance().getSelectSize();
     }
 }

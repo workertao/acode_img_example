@@ -20,7 +20,7 @@
             android:drawableLeft="@mipmap/ic_back_white"
             android:drawablePadding="15px"
             android:paddingLeft="24px"
-            android:text="取消"
+            android:text="返回"
             android:textColor="#ffffff"
             android:textSize="15dp" />
 

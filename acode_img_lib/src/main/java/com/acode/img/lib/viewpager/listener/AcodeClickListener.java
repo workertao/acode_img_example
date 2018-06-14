@@ -15,9 +15,4 @@ public interface AcodeClickListener {
 
     //vp点击事件
     void onAcodeVpClick(int position);
-    //返回所有的数据
-    void onResultPhotoData(ArrayList<ImagePhoto> imagePhotos, ArrayList<ImagePhoto> selectPhotoData);
-    //返回
-    void back();
-
 }

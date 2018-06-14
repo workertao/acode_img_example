@@ -9,6 +9,7 @@ import android.provider.MediaStore;
 import com.acode.img.lib.entity.ImageFloder;
 import com.acode.img.lib.entity.ImagePhoto;
 import com.acode.img.lib.utils.FileUtils;
+import com.acode.img.lib.utils.SingleImagePhotosUtils;
 import com.alibaba.fastjson.JSON;
 
 import java.io.File;
@@ -117,7 +118,9 @@ public class ReadPhotoRunable implements Runnable {
                 }
             });
             //保存全部图片的数据到本地文件
-            FileUtils.saveDataToFile(context, JSON.toJSONString(allImagePhotos), FileUtils.FILE_ALL_PHOTOS_NAME);
+//            FileUtils.saveDataToFile(context, JSON.toJSONString(allImagePhotos), FileUtils.FILE_ALL_PHOTOS_NAME);
+            SingleImagePhotosUtils.getIntance().setAllImagePhotos(allImagePhotos);
+            SingleImagePhotosUtils.getIntance().setCurrentImagePhotos(allImagePhotos);
             //将全部照片添加到自定义的相册中  全部相册信息
             ImageFloder allImageFloder = new ImageFloder();
             allImageFloder.setName("所有照片");

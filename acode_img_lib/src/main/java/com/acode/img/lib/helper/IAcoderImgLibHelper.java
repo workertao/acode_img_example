@@ -26,6 +26,7 @@ public interface IAcoderImgLibHelper {
 
     /**
      * 设置选中的图片数量
+     *
      * @param count
      */
     void setCount(int count);
@@ -36,6 +37,7 @@ public interface IAcoderImgLibHelper {
      * @param position
      */
     void remove(int position);
+
     /**
      * 删除某个
      *
@@ -45,9 +47,10 @@ public interface IAcoderImgLibHelper {
 
     /**
      * 查看大图
-     * @param imagePhotos      图片集合
-     * @param selectPhotoData  选中的图片集合
-     * @param position         第一个展示的下标
+     *
+     * @param imagePhotos     图片集合
+     * @param selectPhotoData 选中的图片集合
+     * @param position        第一个展示的下标
      */
     void showBigPhoto(ArrayList<ImagePhoto> imagePhotos, ArrayList<ImagePhoto> selectPhotoData, int position);
 
@@ -70,4 +73,9 @@ public interface IAcoderImgLibHelper {
      * @param grantResults
      */
     void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults);
+
+    /**
+     * 释放资源
+     */
+    void release();
 }

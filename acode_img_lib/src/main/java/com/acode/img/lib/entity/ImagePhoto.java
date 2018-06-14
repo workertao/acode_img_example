@@ -166,7 +166,7 @@ public class ImagePhoto implements Serializable {
         boolean bres = false;
         if (obj instanceof ImagePhoto) {
             ImagePhoto o = (ImagePhoto) obj;
-            bres = (this.id == o.id) & (this.getPath().equals(o.getPath())) & (this.isSelect() == o.isSelect());
+            bres = (this.getPath().equals(o.getPath()));
         }
         return bres;
     }
