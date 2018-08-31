@@ -1,7 +1,8 @@
 # 仿今日头条自定义相册 #
 ## 效果图##
 ![效果图](http://ohdryj9ow.bkt.clouddn.com/photo.gif)
-(如果查看不了，请点击文字跳转网页查看)
+
+[http://ohdryj9ow.bkt.clouddn.com/photo.gif](http://ohdryj9ow.bkt.clouddn.com/photo.gif "查看不了，请点击")
 
 ## 使用方法 ##
 1.在activity或者frgament实现以下接口
